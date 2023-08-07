@@ -10,6 +10,8 @@ namespace FindMatchesGame
         // objects
         CustomButton buttonStart = new CustomButton();
         CustomButton buttonSelectLevel = new CustomButton();
+        CustomButton buttonSettings = new CustomButton();
+        CustomButton buttonExit = new CustomButton();
 
         public Form1()
         {
@@ -43,9 +45,33 @@ namespace FindMatchesGame
             buttonSelectLevel.Location = new Point(0, buttonStart.Bottom);
             buttonSelectLevel.MouseDown += Button_MouseDown;
             buttonSelectLevel.MouseUp += Button_MouseUp;
+            // BUTTON SETTINGS
+            buttonSettings.Size = sizeButtons;
+            buttonSettings.FlatStyle = FlatStyle.Flat;
+            buttonSettings.FlatAppearance.BorderSize = 0;
+            buttonSettings.BackgroundImage = Image.FromFile("Images/Buttons/ButtonSettings.png");
+            buttonSettings.mouseDownPNG = Image.FromFile("Images/Buttons/ButtonSettingsPressed.png");
+            buttonSettings.mouseUpPNG = Image.FromFile("Images/Buttons/ButtonSettings.png");
+            buttonSettings.BackgroundImageLayout = ImageLayout.Zoom;
+            buttonSettings.Location = new Point(0, buttonSelectLevel.Bottom);
+            buttonSettings.MouseDown += Button_MouseDown;
+            buttonSettings.MouseUp += Button_MouseUp;
+            // BUTTON EXIT
+            buttonExit.Size = sizeButtons;
+            buttonExit.FlatStyle = FlatStyle.Flat;
+            buttonExit.FlatAppearance.BorderSize = 0;
+            buttonExit.BackgroundImage = Image.FromFile("Images/Buttons/ButtonExit.png");
+            buttonExit.mouseDownPNG = Image.FromFile("Images/Buttons/ButtonExitPressed.png");
+            buttonExit.mouseUpPNG = Image.FromFile("Images/Buttons/ButtonExit.png");
+            buttonExit.BackgroundImageLayout = ImageLayout.Zoom;
+            buttonExit.Location = new Point(0, buttonSettings.Bottom);
+            buttonExit.MouseDown += Button_MouseDown;
+            buttonExit.MouseUp += Button_MouseUp;
 
             Controls.Add(buttonStart);
             Controls.Add(buttonSelectLevel);
+            Controls.Add(buttonSettings);
+            Controls.Add(buttonExit);
         }
 
         private void Button_MouseUp(object sender, MouseEventArgs e)
