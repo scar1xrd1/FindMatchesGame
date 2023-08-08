@@ -35,11 +35,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(36)))), ((int)(((byte)(44)))));
-            this.ClientSize = new System.Drawing.Size(481, 450);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
+            this.ClientSize = new System.Drawing.Size(384, 461);
+            this.MinimumSize = new System.Drawing.Size(400, 450);
             this.Name = "Form1";
             this.Text = "Find Matches";
+            this.Resize += new System.EventHandler(this.Form1_Resize);
             this.ResumeLayout(false);
 
         }
