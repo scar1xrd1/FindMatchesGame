@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
+using System.Threading;
 using System.Windows.Forms;
 using static FindMatchesGame.Classes;
 
@@ -14,6 +16,20 @@ namespace FindMatchesGame
         CustomButton buttonSettings = new CustomButton();
         CustomButton buttonExit = new CustomButton();
         Label labelCurrentLevel = new Label();
+
+        List<Button> buttons;
+        int[] buttonImage;
+        List<int> openedButtons;
+        int[] freeImage;
+
+        int clicks;
+        int[] clickButton;
+
+        int timer_tick = 0;
+        int correct = 0;
+        int currentLevel = 1;
+
+        Random random = new Random();
 
         public Form1()
         {
@@ -42,7 +58,8 @@ namespace FindMatchesGame
             buttonStart.BackgroundImageLayout = ImageLayout.Zoom;
             buttonStart.Location = new Point((Width - buttonStart.Width) / 2, 8);
             buttonStart.MouseDown += Button_MouseDown;
-            buttonStart.MouseUp += Button_MouseUp;            
+            buttonStart.MouseUp += Button_MouseUp;
+            buttonStart.Click += ButtonStart_Click;
             // BUTTON SELECT LEVEL
             buttonSelectLevel.Font = new Font(Kotlyarfont, 20);
             buttonSelectLevel.Text = "Выбор уровня ";
@@ -86,19 +103,190 @@ namespace FindMatchesGame
             buttonExit.MouseDown += Button_MouseDown;
             buttonExit.MouseUp += Button_MouseUp;
             buttonExit.Click += ButtonExit_Click;
+            // LABEL CURRENT LEVEL
+            labelCurrentLevel.Text = "уровень";
+            labelCurrentLevel.ForeColor = Color.FromArgb(255, 186, 216);
+            labelCurrentLevel.Font = new Font(Kotlyarfont, 30);
+            labelCurrentLevel.AutoSize = true;
+            labelCurrentLevel.Visible = false;
 
             Controls.Add(buttonStart);
             Controls.Add(buttonSelectLevel);
             Controls.Add(buttonSettings);
             Controls.Add(buttonExit);
+            Controls.Add(labelCurrentLevel);
+        }
+
+        void StartLevel(int level)
+        {
+            if(level == 1)
+            {
+                currentLevel = 1;
+                Size = new Size(415, 440);
+
+                buttons = new List<Button>(4);
+                buttonImage = new int[4];
+                freeImage = new int[2];
+                openedButtons = new List<int>();
+                int indexFreeImage = 0;
+                clicks = 0;
+                clickButton = new int[2];
+                correct = 0;
+
+                for (int i = 0; i < freeImage.Length; i++) { freeImage[i] = i + 1; }
+
+                int x = 0;
+                int y = 0;
+                int raz = 0;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    buttons.Add(new Button());
+                }
+
+                for (int i = 0; i < buttons.Count; i++)
+                {
+                    if (raz++ == 2) { y += 200; x = 0; }
+
+                    buttons[i].Size = new Size(200, 200);
+                    buttons[i].Location = new Point(x, y);
+                    buttons[i].BackColor = Color.AliceBlue;
+                    buttons[i].FlatStyle = FlatStyle.Flat;
+                    buttons[i].FlatAppearance.BorderColor = Color.FromArgb(255, 186, 216);
+                    buttons[i].FlatAppearance.BorderSize = 1;
+                    buttons[i].BackgroundImage = Image.FromFile("Images/Buttons/Closed.png");
+                    buttons[i].BackgroundImageLayout = ImageLayout.Zoom;
+                    buttons[i].Click += Buttons_Click;
+                    Controls.Add(buttons[i]);
+
+                    x += 200;
+                }
+
+                while(true)
+                {
+                    int buttonIndex = random.Next(0, buttonImage.Length);
+                    if (buttonImage[buttonIndex] == 0)
+                    {
+                        buttonImage[buttonIndex] = freeImage[indexFreeImage];
+
+                        while(true)
+                        {
+                            buttonIndex = random.Next(0, buttonImage.Length);
+                            if (buttonImage[buttonIndex] == 0) { buttonImage[buttonIndex] = freeImage[indexFreeImage++]; break; }
+                        }
+                    }
+                    if (indexFreeImage == freeImage.Length) break;
+                }
+
+                //for (int i = 0; i < buttonImage.Length; i++)
+                //{
+                //    MessageBox.Show(buttonImage[i].ToString());
+                //}
+            }
+            else if(level == 2)
+            {
+
+            }
+        }
+
+        void DisableMenu()
+        {
+            buttonStart.Visible = false;
+            buttonSelectLevel.Visible = false;
+            buttonSettings.Visible = false;
+            buttonExit.Visible = false;
+        }
+        void EnableMenu()
+        {
+            buttonStart.Visible = true;
+            buttonSelectLevel.Visible = true;
+            buttonSettings.Visible = true;
+            buttonExit.Visible = true;
+        }
+
+        private void Buttons_Click(object sender, EventArgs e)
+        {
+            Button button = sender as Button;
+
+            int ii = 0;
+
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                if(button == buttons[i])
+                {
+                    ii = i;
+                    clickButton[clicks++] = i;
+                    button.BackgroundImage = ImageFromIndex(buttonImage[i]);
+                    break;
+                }
+            }
+            
+            if(clicks == 2)
+            {
+                if (buttonImage[clickButton[0]] == buttonImage[clickButton[1]])
+                {
+                    openedButtons.Add(clickButton[0]);
+                    openedButtons.Add(clickButton[1]);
+
+                    clickButton = new int[2];
+                    clicks = 0;
+                    correct++;
+                    HideButtons();
+
+                    if (correct == 2) StopGame();
+                }
+                else
+                {
+                    clickButton = new int[2];
+                    clicks = 0;
+                    timer1.Start();
+                }                
+            }
+            
+        }
+
+        private void HideButtons()
+        {
+            if(openedButtons.Count < 1)
+            {
+                foreach(var button in buttons) button.BackgroundImage = Image.FromFile("Images/Buttons/Closed.png");
+            }
+            else
+            {
+                for (int i = 0; i < buttons.Count; i++)
+                {
+                    if (openedButtons.Contains(i)) continue;
+                    else
+                    {
+                        buttons[i].BackgroundImage = Image.FromFile("Images/Buttons/Closed.png");
+                    }
+                }
+            }
+        }
+
+        private void StopGame()
+        {
+            Size = new Size(400, 500);
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                buttons[i].Dispose();
+            }
+            EnableMenu();
+            currentLevel++;
+        }
+
+        private Image ImageFromIndex(int index) => Image.FromFile($"Images/GameButtons/{index}.png");
+
+        private void ButtonStart_Click(object sender, EventArgs e)
+        {
+            DisableMenu();
+            StartLevel(1);
         }
 
         private void ButtonExit_Click(object sender, EventArgs e)
         {
             Close();
-        }       
-
-        private Image NumberImage(string number) { return Image.FromFile($"Images/Numbers/{number}.png"); }
+        }
 
         private void Form1_Resize(object sender, EventArgs e)
         {
@@ -120,6 +308,19 @@ namespace FindMatchesGame
         {
             CustomButton button = (CustomButton)sender;
             button.CustomButton_MouseDown(this, e);
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            timer_tick++;
+
+            if(timer_tick == 50)
+            {
+                HideButtons();
+
+                timer_tick = 0;
+                timer1.Stop();
+            }
         }
     }
 }
